@@ -16,7 +16,7 @@ class FileManager:
         # TODO:
         # Implement a process that writes the contents of `data` to the file `filename`
         try:
-            with open(filename, "a") as file:
+            with open(filename, "w") as file:
                 file.write(data)
         except Exception as e:
             print(f"The following exception occured when trying to write date to file: {e}")
