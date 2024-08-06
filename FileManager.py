@@ -64,23 +64,25 @@ class FileManager:
         try:
             if not isinstance(data, dict):
                 raise ValueError("The given data does not have the proper dictionary format")
-            try:
-                with open(json_file_path, "r") as file:
-                    file_content = json.load(file)
+            # try:
+            #     with open(json_file_path, "r") as file:
+            #         file_content = json.load(file)
 
-                    if not isinstance(file_content, list) and not all(isinstance(item, dict) for item in file_content):
-                        raise ValueError(f"The given file path does not contain a list of dictionaries. Please check format")
+            #         if not isinstance(file_content, list) and not all(isinstance(item, dict) for item in file_content):
+            #             raise ValueError(f"The given file path does not contain a list of dictionaries. Please check format")
                                 
-            except FileNotFoundError:
-                print(f"The file {json_file_path} was not found")
-            except Exception as e:
-                print(f"The following error occured: {e}")
+            # except FileNotFoundError:
+            #     print(f"The file {json_file_path} was not found")
+            # except Exception as e:
+            #     print(f"The following error occured: {e}")
 
+            file_content = self.read_json(json_file_path)
             file_content.append(data)
+            self.write_json(file_content, json_file_path)
 
-            with open(json_file_path, "w") as file:
-                json.dumps(file_content, file, indent = 4)
-                print(f"Dictionary was succesfully added to the file {json_file_path}")
+            # with open(json_file_path, "w") as file:
+            #     json.dumps(file_content, file, indent = 4)
+            #     print(f"Dictionary was succesfully added to the file {json_file_path}")
 
         except PermissionError:
             print(f"You do not have permission to write to {json_file_path} file")
