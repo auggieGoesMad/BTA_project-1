@@ -53,8 +53,6 @@ class Account:
         except Exception as e:
             print(f"The following error occured when trying to open for writing for/in hist.json file: {e}")
 
-
-
         # self.file_manager 
 
     def deposit(self, amount):
@@ -99,7 +97,6 @@ class Account:
             self.write_to_history(history_message)
         
     def debit(self, amount):
-        pass
         # TODO:
         # implement account debits with all necessary checks
         # amount must be a integer greater than 0
@@ -114,12 +111,34 @@ class Account:
         
         # history_message = HistoryMessages.debit("failure", amount, self.balance)
         # self.write_to_history(history_message)
-        #if amount <= 0:
-            # history_message = HistoryMessages.deposit("failure", amount, self.balance)
-            # self.write_to_history(history_message)
-            # raise ValueError(f"The value to be deposited is too low")
-        
 
+        if not isinstance(amount, float):
+             print ("Invalid amount for debit!")
+             history_message = HistoryMessages.debit("failure", amount, self.balance)
+             self.write_to_history(history_message)
+             return
+
+        if amount <= 0 or amount > self.balance:
+            print ("Invalid amount for debit!")
+            history_message = HistoryMessages.debit("failure", amount, self.balance)
+            self.write_to_history(history_message)
+            return
+        try:
+            self.balance -= amount
+            isTransactionMade = True
+            
+            if isTransactionMade:
+                history_message = HistoryMessages.debit("success", amount, self.balance)
+                self.write_to_history(history_message)
+            else:
+                history_message = HistoryMessages.debit("failure", amount, self.balance)
+                self.write_to_history(history_message)
+        except Exception as e:
+            print(f"The following error ocurred during debit: {e}")
+            history_message = HistoryMessages.debit("failure", amount, self.balance)
+            self.write_to_history(history_message)
+
+    
     def get_balance(self):
         return self.balance
 
