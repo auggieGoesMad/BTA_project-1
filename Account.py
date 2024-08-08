@@ -69,32 +69,42 @@ class Account:
             
         # history_message = HistoryMessages.deposit("failure", amount, self.balance)
         # self.write_to_history(history_message)
-        if not isinstance(amount, float):
-             print ("Invalid amount for deposit!")
-             history_message = HistoryMessages.deposit("failure", amount, self.balance)
-             self.write_to_history(history_message)
-             return
+        # if not isinstance(amount, int) or not isinstance(amount, float):
+        #      print ("Invalid amount for deposit!")
+        #      history_message = HistoryMessages.deposit("failure", amount, self.balance)
+        #      self.write_to_history(history_message)
+        #      return
         
-        if amount <= 0:
-            print("Invalid amount for deposit!")
+        try:
+            given_amount = int(amount)
+            
+            if given_amount <= 0:
+                print("Invalid amount for deposit!")
+                history_message = HistoryMessages.deposit("failure", given_amount, self.balance)
+                self.write_to_history(history_message)
+                return
+        
+            try:
+                self.balance += given_amount
+                isTransactionMade = True
+                
+                if isTransactionMade:
+                    history_message = HistoryMessages.deposit("success", given_amount, self.balance)
+                    self.write_to_history(history_message)
+                else:
+                    history_message = HistoryMessages.deposit("failure", given_amount, self.balance)
+                    self.write_to_history(history_message)
+            except Exception as e:
+                print(f"The following error ocurred during deposit: {e}")
+                history_message = HistoryMessages.deposit("failure", given_amount, self.balance)
+                self.write_to_history(history_message)
+        except Exception:
+            print ("Invalid amount for deposit!")
             history_message = HistoryMessages.deposit("failure", amount, self.balance)
             self.write_to_history(history_message)
             return
-        
-        try:
-            self.balance += amount
-            isTransactionMade = True
             
-            if isTransactionMade:
-                history_message = HistoryMessages.deposit("success", amount, self.balance)
-                self.write_to_history(history_message)
-            else:
-                history_message = HistoryMessages.deposit("failure", amount, self.balance)
-                self.write_to_history(history_message)
-        except Exception as e:
-            print(f"The following error ocurred during deposit: {e}")
-            history_message = HistoryMessages.deposit("failure", amount, self.balance)
-            self.write_to_history(history_message)
+        
         
     def debit(self, amount):
         # TODO:
@@ -112,31 +122,34 @@ class Account:
         # history_message = HistoryMessages.debit("failure", amount, self.balance)
         # self.write_to_history(history_message)
 
-        if not isinstance(amount, float):
-             print ("Invalid amount for debit!")
-             history_message = HistoryMessages.debit("failure", amount, self.balance)
-             self.write_to_history(history_message)
-             return
+        try:
+            given_amount = int(amount)
 
-        if amount <= 0 or amount > self.balance:
+            if given_amount <= 0 or given_amount > self.balance:
+                print ("Invalid amount for debit!")
+                history_message = HistoryMessages.debit("failure", given_amount, self.balance)
+                self.write_to_history(history_message)
+                return
+            try:
+                self.balance -= given_amount
+                isTransactionMade = True
+                
+                if isTransactionMade:
+                    history_message = HistoryMessages.debit("success", given_amount, self.balance)
+                    self.write_to_history(history_message)
+                else:
+                    history_message = HistoryMessages.debit("failure", given_amount, self.balance)
+                    self.write_to_history(history_message)
+            except Exception as e:
+                print(f"The following error ocurred during debit: {e}")
+                history_message = HistoryMessages.debit("failure", given_amount, self.balance)
+                self.write_to_history(history_message)
+        
+        except Exception:
             print ("Invalid amount for debit!")
             history_message = HistoryMessages.debit("failure", amount, self.balance)
             self.write_to_history(history_message)
             return
-        try:
-            self.balance -= amount
-            isTransactionMade = True
-            
-            if isTransactionMade:
-                history_message = HistoryMessages.debit("success", amount, self.balance)
-                self.write_to_history(history_message)
-            else:
-                history_message = HistoryMessages.debit("failure", amount, self.balance)
-                self.write_to_history(history_message)
-        except Exception as e:
-            print(f"The following error ocurred during debit: {e}")
-            history_message = HistoryMessages.debit("failure", amount, self.balance)
-            self.write_to_history(history_message)
 
     
     def get_balance(self):
@@ -150,7 +163,17 @@ class Account:
         
 
     def get_history(self):
-        pass
         # TODO:
         # implement a process that returns transaction history line by line
         # use the dict_to_string method to create a string from a dictionary
+        with open(self.hist_file_path, "r") as file:
+            try:
+                file_content = json.load(file)
+                
+                for item in file_content:
+                    item_string = self.dict_to_string(item)
+                    print(item_string)
+            except json.JSONDecodeError as e:
+                print (f"The following error ocuured while reading from the hist.json file: {e}")
+
+
