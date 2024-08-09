@@ -9,9 +9,7 @@ class CurrencyExchange:
         self.file_manager = FileManager()
         self.hist_file_path = "hist.json"
         
-
     def write_to_history(self, hist_dict):
-        pass 
         # TODO:
         # Comment and refine the code below so that the dictionary 
         # from hist_dict is added to hist.json
@@ -23,13 +21,19 @@ class CurrencyExchange:
         # and returns the resulting dictionary.
 
         url = "https://fake-api.apps.berlintech.ai/api/currency_exchange"
-        
-        response = requests.get(url)
-        
-        if response.status_code == "200":
-            return response.json() 
-        
-        print("Currency exchange failed!")
+
+        try:
+            response = requests.get(url)
+
+            response.raise_for_status()
+
+            try:
+                data = response.json()
+                return data
+            except ValueError as e:
+                raise ValueError("Response content is not valid") from e
+        except requests.exceptions.RequestException as e:
+            print(f"The following error ocurred durin getting the exchange rates: {e}")
     
     def exchange_currency(self, currency_from, currency_to, amount):
 
@@ -46,6 +50,7 @@ class CurrencyExchange:
         # history_message = HistoryMessages.exchange("failure", amount, None, currency_from, currency_to)
         # self.write_to_history(history_message)
 
+        get_exchange_rates = self.get_exchange_rates()
         try:
             given_amount = int(amount)
 
@@ -55,23 +60,27 @@ class CurrencyExchange:
                 self.write_to_history(history_message)
                 return
             
-            if currency_from not in self.get_exchange_rates:
+            #if currency_from not in self.get_exchange_rates:
+            if get_exchange_rates.get(currency_from) is None:
                 print("Currency exchange failed!")
                 history_message = HistoryMessages.exchange("failure", amount, None, currency_from, currency_to)
                 self.write_to_history(history_message)
                 return None
             
-            if currency_from not in self.get_exchange_rates:
+            #if currency_from not in self.get_exchange_rates:
+            if get_exchange_rates.get(currency_to) is None:
                 print("Currency exchange failed!")
                 history_message = HistoryMessages.exchange("failure", amount, None, currency_from, currency_to)
                 self.write_to_history(history_message)
                 return None
             
-            # conversion_rate = self.exchange_rates[currency_from][currency_to]
-            # converted_amount = amount * conversion_rate
+            extract_currency_from = get_exchange_rates[currency_from]
+            extract_currency_to = get_exchange_rates[currency_to]
+            converted_amount = (given_amount * extract_currency_to)/extract_currency_from
 
-            history_message = HistoryMessages.exchange("success", amount, converted_amount, currency_from, currency_to)
+            history_message = HistoryMessages.exchange("success", given_amount, converted_amount, currency_from, currency_to)   
             self.write_to_history(history_message)
+            return converted_amount
 
         except Exception:
             print("Currency exchange failed!")

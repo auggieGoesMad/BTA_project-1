@@ -28,11 +28,11 @@ def main():
             print(f"Select a currency from the available currencies: {available_currency}")
             source_currency = input("Enter source currency: ")
             target_currency = input("Enter target currency: ")
-            exchange_amount = input("Enter target currency: ")
+            exchange_amount = input("Enter source amount: ")
 
             result = exchange.exchange_currency(source_currency, target_currency, exchange_amount)
             if result is not None:
                 print(f"Converted amount: {result} {target_currency}")
 
 if __name__ == "__main__":
-    main()
+    main()                             
